@@ -3,56 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PDF.js Inline Viewer for iOS Safari</title>
+  <title>PDF.js Multi-Page Viewer</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      text-align: center;
+      padding: 20px;
+      background: #fafafa;
+    }
+    #pdf-container {
+      max-width: 800px;
+      margin: auto;
     }
     canvas {
+      display: block;
+      margin: 10px auto;
       border: 1px solid #ccc;
-      width: 100%;
-      height: auto;
     }
   </style>
 </head>
 <body>
-  <h1>PDF.js Inline Viewer</h1>
-  <canvas id="pdf-canvas"></canvas>
 
-  <!-- PDF.js library -->
+  <h1>PDF.js Multi-Page Viewer</h1>
+  <div id="pdf-container"></div>
+
+  <!-- PDF.js library from CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
-    // Specify the workerSrc property for PDF.js
+    // Set the workerSrc property for PDF.js
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
     // Replace with your raw PDF URL from GitHub
     const url = 'https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf';
 
-    // Asynchronously download and render the PDF
+    const container = document.getElementById('pdf-container');
+
+    // Asynchronously load the PDF
     pdfjsLib.getDocument(url).promise.then(pdf => {
-      // Load the first page
-      pdf.getPage(1).then(page => {
-        const scale = 1.5; // Adjust scale as needed for better readability
-        const viewport = page.getViewport({ scale: scale });
-        const canvas = document.getElementById('pdf-canvas');
-        const context = canvas.getContext('2d');
-
-        // Set canvas dimensions to match the page's viewport
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        // Render the page into the canvas context
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        };
-        page.render(renderContext);
-      });
+      // Loop through each page and render it
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        pdf.getPage(pageNum).then(page => {
+          const scale = 1.5; // Adjust scale for readability
+          const viewport = page.getViewport({ scale: scale });
+          
+          // Create a canvas element for this page
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          container.appendChild(canvas);
+          
+          const context = canvas.getContext('2d');
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext);
+        });
+      }
     }).catch(error => {
-      console.error('Error loading PDF: ' + error);
+      console.error('Error loading PDF: ', error);
+      container.innerHTML = '<p>Failed to load PDF. Please try again later.</p>';
     });
   </script>
 </body>
 </html>
+
