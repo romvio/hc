@@ -3,98 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Responsive PDF Viewer (Safari-Friendly)</title>
+  <title>PDF.js Inline Viewer for iOS Safari</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
       font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    header {
-      padding: 1rem;
-      background-color: #f1f1f1;
+      margin: 20px;
       text-align: center;
     }
-
-    .pdf-container {
-      flex: 1;                /* Fill available vertical space */
-      width: 100%;
-      height: 80vh;           /* Use viewport units for responsiveness */
+    canvas {
       border: 1px solid #ccc;
-      box-sizing: border-box;
-      margin: 0 auto;
-      display: block;
-    }
-
-    /* Adjust the PDF container for medium-sized screens */
-    @media (max-width: 768px) {
-      .pdf-container {
-        height: 70vh;
-      }
-    }
-
-    /* Adjust the PDF container for small screens */
-    @media (max-width: 480px) {
-      .pdf-container {
-        height: 60vh;
-      }
+      width: 100%;
+      height: auto;
     }
   </style>
 </head>
 <body>
+  <h1>PDF.js Inline Viewer</h1>
+  <canvas id="pdf-canvas"></canvas>
 
-  <header>
-    <h1>Responsive PDF Viewer</h1>
-  </header>
-
-  <!-- Replace the URL below with your *raw* PDF link from GitHub -->
-  <object
-    id="pdfObject"
-    class="pdf-container"
-    data="https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf"
-    type="application/pdf">
-    <!-- Fallback content for browsers that don't support embedded PDFs -->
-    <p>
-      Your browser does not support viewing PDFs inline.
-      <a href="https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf">
-        Download the PDF
-      </a>
-      instead.
-    </p>
-  </object>
-
+  <!-- PDF.js library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
-    (function() {
-      // Simple user-agent checks for iOS Safari
-      var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-      var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-      
-      if (isIOS && isSafari) {
-        // Hide the embedded PDF <object> if on iOS Safari
-        var pdfObject = document.getElementById('pdfObject');
-        pdfObject.style.display = 'none';
+    // Specify the workerSrc property for PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // Create a fallback message/link
-        var fallbackMessage = document.createElement('div');
-        fallbackMessage.style.padding = '1rem';
-        fallbackMessage.style.textAlign = 'center';
-        fallbackMessage.innerHTML = `
-          <p>
-            Inline PDF viewing is not supported on iOS Safari. 
-            <a href="https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf">
-              Download the PDF
-            </a>
-            instead.
-          </p>
-        `;
-        pdfObject.parentNode.insertBefore(fallbackMessage, pdfObject.nextSibling);
-      }
-    })();
+    // Replace with your raw PDF URL from GitHub
+    const url = 'https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf';
+
+    // Asynchronously download and render the PDF
+    pdfjsLib.getDocument(url).promise.then(pdf => {
+      // Load the first page
+      pdf.getPage(1).then(page => {
+        const scale = 1.5; // Adjust scale as needed for better readability
+        const viewport = page.getViewport({ scale: scale });
+        const canvas = document.getElementById('pdf-canvas');
+        const context = canvas.getContext('2d');
+
+        // Set canvas dimensions to match the page's viewport
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // Render the page into the canvas context
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+        page.render(renderContext);
+      });
+    }).catch(error => {
+      console.error('Error loading PDF: ' + error);
+    });
   </script>
-
 </body>
 </html>
