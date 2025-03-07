@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Responsive PDF Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 1rem;
+      background-color: #f1f1f1;
+      text-align: center;
+    }
+
+    .pdf-container {
+      flex: 1; /* Let this container fill available space */
+      width: 100%;
+      /* Set an initial height, using viewport units so it adapts to screen size */
+      height: 80vh;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* For small screens, we can adjust the height to something smaller or bigger */
+    @media (max-width: 768px) {
+      .pdf-container {
+        height: 70vh; /* Adjust as you see fit */
+      }
+    }
+
+    /* For even smaller devices, you can adjust again if necessary */
+    @media (max-width: 480px) {
+      .pdf-container {
+        height: 60vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Responsive PDF Viewer</h1>
+  </header>
+
+  <!-- Replace the URL below with your raw PDF link -->
+  <object
+    class="pdf-container"
+    data="https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf"
+    type="application/pdf">
+    <!-- Fallback content for browsers that don't support embedded PDFs -->
+    <p>
+      Your browser does not support viewing PDFs inline.
+      <a href="https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf">
+        Download the PDF
+      </a>
+      instead.
+    </p>
+  </object>
+
+</body>
+</html>
