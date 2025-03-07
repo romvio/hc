@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Responsive PDF Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Responsive PDF Viewer (Safari-Friendly)</title>
   <style>
     body {
       margin: 0;
@@ -21,24 +21,23 @@
     }
 
     .pdf-container {
-      flex: 1; /* Let this container fill available space */
+      flex: 1;                /* Fill available vertical space */
       width: 100%;
-      /* Set an initial height, using viewport units so it adapts to screen size */
-      height: 80vh;
+      height: 80vh;           /* Use viewport units for responsiveness */
       border: 1px solid #ccc;
       box-sizing: border-box;
       margin: 0 auto;
       display: block;
     }
 
-    /* For small screens, we can adjust the height to something smaller or bigger */
+    /* Adjust the PDF container for medium-sized screens */
     @media (max-width: 768px) {
       .pdf-container {
-        height: 70vh; /* Adjust as you see fit */
+        height: 70vh;
       }
     }
 
-    /* For even smaller devices, you can adjust again if necessary */
+    /* Adjust the PDF container for small screens */
     @media (max-width: 480px) {
       .pdf-container {
         height: 60vh;
@@ -52,8 +51,9 @@
     <h1>Responsive PDF Viewer</h1>
   </header>
 
-  <!-- Replace the URL below with your raw PDF link -->
+  <!-- Replace the URL below with your *raw* PDF link from GitHub -->
   <object
+    id="pdfObject"
     class="pdf-container"
     data="https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf"
     type="application/pdf">
@@ -66,6 +66,35 @@
       instead.
     </p>
   </object>
+
+  <script>
+    (function() {
+      // Simple user-agent checks for iOS Safari
+      var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      
+      if (isIOS && isSafari) {
+        // Hide the embedded PDF <object> if on iOS Safari
+        var pdfObject = document.getElementById('pdfObject');
+        pdfObject.style.display = 'none';
+
+        // Create a fallback message/link
+        var fallbackMessage = document.createElement('div');
+        fallbackMessage.style.padding = '1rem';
+        fallbackMessage.style.textAlign = 'center';
+        fallbackMessage.innerHTML = `
+          <p>
+            Inline PDF viewing is not supported on iOS Safari. 
+            <a href="https://raw.githubusercontent.com/romvio/hc/refs/heads/main/Counseling%20Services%20%C2%B7%20NYUAD%20Students.pdf">
+              Download the PDF
+            </a>
+            instead.
+          </p>
+        `;
+        pdfObject.parentNode.insertBefore(fallbackMessage, pdfObject.nextSibling);
+      }
+    })();
+  </script>
 
 </body>
 </html>
